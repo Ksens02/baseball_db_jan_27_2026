@@ -14,9 +14,10 @@ cursor = conn.cursor()
 query = """
     SELECT playerID,yearID,teamID,HR
     FROM batting
-    WHERE yearID = 1976
+    WHERE teamID = 'PHI' and yearID = 1976 and HR != 0
+    ORDER BY HR desc
 """
-
+# delete 'desc' if you want HR ordered lowest to highest
 
 cursor.execute(query)
 records = cursor.fetchall()
