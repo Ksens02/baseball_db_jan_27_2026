@@ -5,7 +5,7 @@ import gradio as gr
 conn = sqlite3.connect('../baseball.db')
 cursor = conn.cursor()
 query = """
-    WITH top_hitters AS (SELECT nameFirst, nameLast
+    WITH top_hitters AS (SELECT nameFirst, nameLast, batting.playerID
     FROM batting INNER JOIN people
     ON batting.playerID = people.playerID
     WHERE teamID = 'PHI'
@@ -13,7 +13,7 @@ query = """
     ORDER by sum(HR) desc
     LIMIT 10)
 
-    SELECT CONCAT(nameFirst,' ',nameLast) as player
+    SELECT CONCAT(nameFirst,' ',nameLast) as player, playerID
     FROM top_hitters
     ORDER BY nameLast
 """
@@ -22,14 +22,16 @@ cursor.execute(query)
 records = cursor.fetchall()
 conn.close()
 
-players = []
-for record in records:
-    players.append(record[0])
-# with gr.Blocks() as iface:
-#     playerID = gr.Dropdown(choices = records(), interactive = True)
-#     HR = gr.Number(label = "Home Runs")
-#     playerID.change(fn = f, inputs = [playerID], outputs = [HR])
+
+# players = []
+# for record in records:
+#     players.append(record[0])
+
+
+
+with gr.Blocks() as iface:
+    gr.Dropdown(choices = records, interactive = True)
+    gr.LinePlot(records)
 
     
-# iface.launch()
-print(players)
+iface.launch()
