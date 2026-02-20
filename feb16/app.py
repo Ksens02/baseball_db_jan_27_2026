@@ -28,10 +28,26 @@ conn.close()
 #     players.append(record[0])
 
 
+# ? --> can't do playerID = playerID so we do playerID = ? // in the cursor.execute(query, [playerID]) the list says what goes in for the ?
+def f(playerID):
+    conn = sqlite3.connect('../baseball.db')
+    cursor = conn.cursor()
+    query = """
+    SELECT CAST(yearID AS text), HR
+    FROM batting
+    WHERE teamID = 'PHI' AND playerID = ?
+    """
+
+    cursor.execute(query,[playerID])
+    records = cursor.fetchall()
+    conn.close()
+    df = pd.DataFrame(records,columns = ["year","home runs"])
+    return df
+
 
 with gr.Blocks() as iface:
-    gr.Dropdown(choices = records, interactive = True)
-    gr.LinePlot(records)
-
+    player_dd = gr.Dropdown(choices = records, interactive = True)
+    plot = gr.LinePlot(x = "year",  y = "home runs" )
+    player_dd.change(fn = f, inputs = [player_dd], outputs = [plot])
     
 iface.launch()
